@@ -3,11 +3,18 @@
 DOWNLOAD_SOURCE_URL=https://heronhdi.blob.core.windows.net/heron-bin/
 echo "DOWNLOAD_SOURCE_URL=$DOWNLOAD_SOURCE_URL"
 
-#CHANGE_ME
-TARGET_INSTALL_DIR=/usr/hdp/current/heron
-echo "TARGET_INSTALL_DIR=$TARGET_INSTALL_DIR"
-ZKHOSTS="zk0"
+if [ -z "$1" ] 
+then
+    echo "Updating ZooKeeper host info in Heron config files is needed."
+    ZKHOSTS="zk0"
+else
+    ZKHOSTS=$1
+fi
 echo "ZKHOSTS=$ZKHOSTS"
+
+#CHANGE_ME
+TARGET_INSTALL_DIR=/usr/heron
+echo "TARGET_INSTALL_DIR=$TARGET_INSTALL_DIR"
 HADOOP_CONF_DIR="/etc/hadoop/conf"
 echo "HADOOP_CONF_DIR=$HADOOP_CONF_DIR"
 
