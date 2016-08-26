@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# Import installer helper method module.
+HDI_HELPER_FILE_NAME=HDInsightUtilities-v01.sh
+HDI_HELPER_SOURCE=https://hdiconfigactions.blob.core.windows.net/linuxconfigactionmodulev01
+echo "Downloading helper functions: $HDI_HELPER_SOURCE/$HDI_HELPER_FILE_NAME"
+wget -O /tmp/$HDI_HELPER_FILE_NAME -q $HDI_HELPER_SOURCE/$HDI_HELPER_FILE_NAME && source /tmp/$HDI_HELPER_FILE_NAME && rm -f /tmp/$HDI_HELPER_FILE_NAME
+
+
+#########################################
+# Data node specific actions below
+#########################################
+if [ `test_is_datanode` == 1 ]; then
+    echo "This is a data node. Installing required packages "
+    apt-get install libunwind-setjmp0-dev -y
+    exit 0
+fi
+
+#########################################
+# Head node specific actions below
+#########################################
+
 # Parse options to the installer, zookeeper host and heron version to be installed
 ZK_HOSTS="zk0-heron"
 HERON_VERSION="stable"
@@ -16,7 +36,13 @@ while getopts ":z:v:f" opt; do
       OVERWRITE=true
       ;;
     \?)
-      echo "Usage <installer> [-z zk0-heron] [-v 0.14.3.SNAPSHOT]" 1>&2
+      echo " " 1>&2
+      echo "Invalid use of the installer" 1>&2 
+      echo "Usage e.g. [-z zk0-heron] [-v 0.14.3.SNAPSHOT] [-f]" 1>&2
+      echo "-z zookeeper host" 1>&2
+      echo "-v heron installer version" 1>&2
+      echo "-f force overwrite existing installation" 1>&2
+      echo " " 1>&2
       exit 1
       ;;
     :)
@@ -27,13 +53,6 @@ while getopts ":z:v:f" opt; do
 done
 echo "ZK_HOSTS=$ZK_HOSTS"
 echo "HERON_VERSION=$HERON_VERSION"
-
-
-# Import installer helper method module.
-HDI_HELPER_FILE_NAME=HDInsightUtilities-v01.sh
-HDI_HELPER_SOURCE=https://hdiconfigactions.blob.core.windows.net/linuxconfigactionmodulev01
-echo "Downloading helper functions: $HDI_HELPER_SOURCE/$HDI_HELPER_FILE_NAME"
-wget -O /tmp/$HDI_HELPER_FILE_NAME -q $HDI_HELPER_SOURCE/$HDI_HELPER_FILE_NAME && source /tmp/$HDI_HELPER_FILE_NAME && rm -f /tmp/$HDI_HELPER_FILE_NAME
 
 
 # Prepare target install directory
