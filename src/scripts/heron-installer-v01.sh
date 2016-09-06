@@ -75,11 +75,12 @@ fi
 DOWNLOAD_SOURCE_URL="https://heronhdi.blob.core.windows.net/heron-bin/"
 HERON_CLIENT_INSTALLER="heron-client-install-$HERON_VERSION-ubuntu14.sh"
 HERON_TOOLS_INSTALLER="heron-tools-install-$HERON_VERSION-ubuntu14.sh"
+HERON_RC="$TARGET_INSTALL_DIR/.heronrc"
 
 echo "Downloading and installing Heron client: $DOWNLOAD_SOURCE_URL/$HERON_CLIENT_INSTALLER"
 download_file $DOWNLOAD_SOURCE_URL/$HERON_CLIENT_INSTALLER /tmp/$HERON_CLIENT_INSTALLER
 chmod +x /tmp/$HERON_CLIENT_INSTALLER
-/tmp/$HERON_CLIENT_INSTALLER --prefix=$TARGET_INSTALL_DIR --heronrc=$TARGET_INSTALL_DIR/.heronrc
+/tmp/$HERON_CLIENT_INSTALLER --prefix=$TARGET_INSTALL_DIR --heronrc=$HERON_RC
 rm -f /tmp/$HERON_CLIENT_INSTALLER
 
 echo "Downloading and installing Heron tools: $DOWNLOAD_SOURCE_URL/$HERON_TOOLS_INSTALLER"
@@ -120,38 +121,44 @@ statemgrs:
     tunnelhost: "localhost"
 EOL
 
-
-# REMOVE_ME
+# Configure heron client classpath
+echo "Updating heron rc file: $HERON_RC"
+HADOOP_HOME="/usr/hdp/current"
 HADOOP_CONF_DIR="/etc/hadoop/conf"
-echo "HADOOP_CONF_DIR=$HADOOP_CONF_DIR"
-# Copy jars needed by client till heron supports classpaths
-TEMP_CLASSPATH_DIR=$TARGET_INSTALL_DIR/heron/lib/scheduler
-cp /usr/hdp/current/hadoop-client/client/jackson-mapper-asl.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/jackson-core-asl.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/jackson-jaxrs.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/jackson-xc.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/commons-collections.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/commons-configuration.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/commons-compress.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/commons-logging.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/commons-lang.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/htrace-core.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/avro.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/jersey-core.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/jersey-client.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/netty-all.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/client/jetty-util.jar $TEMP_CLASSPATH_DIR
+HADOOP_CLIENT_HOME="$HADOOP_HOME/hadoop-client"
 
-cp /usr/hdp/current/hadoop-client/lib/azure-storage*.jar $TEMP_CLASSPATH_DIR
+declare -a requiredJars=(
+"$HADOOP_CONF_DIR"
+"$HADOOP_CLIENT_HOME/client/jackson-mapper-asl.jar"
+"$HADOOP_CLIENT_HOME/client/jackson-core-asl.jar"
+"$HADOOP_CLIENT_HOME/client/jackson-jaxrs.jar"
+"$HADOOP_CLIENT_HOME/client/jackson-xc.jar"
+"$HADOOP_CLIENT_HOME/client/commons-collections.jar"
+"$HADOOP_CLIENT_HOME/client/commons-configuration.jar"
+"$HADOOP_CLIENT_HOME/client/commons-compress.jar"
+"$HADOOP_CLIENT_HOME/client/commons-logging.jar"
+"$HADOOP_CLIENT_HOME/client/commons-lang.jar"
+"$HADOOP_CLIENT_HOME/client/htrace-core.jar"
+"$HADOOP_CLIENT_HOME/client/avro.jar"
+"$HADOOP_CLIENT_HOME/client/jersey-core.jar"
+"$HADOOP_CLIENT_HOME/client/jersey-client.jar"
+"$HADOOP_CLIENT_HOME/client/netty-all.jar"
+"$HADOOP_CLIENT_HOME/client/jetty-util.jar"
+"$HADOOP_CLIENT_HOME/lib/azure-storage*.jar"
+"$HADOOP_CLIENT_HOME/hadoop-auth.jar"
+"$HADOOP_CLIENT_HOME/hadoop-azure.jar"
+"$HADOOP_CLIENT_HOME/hadoop-common.jar"
+"$HADOOP_HOME/hadoop-yarn-client/hadoop-yarn-api.jar"
+"$HADOOP_HOME/hadoop-yarn-client/hadoop-yarn-client.jar"
+"$HADOOP_HOME/hadoop-yarn-client/hadoop-yarn-common.jar"
+                 )
+for jar in "${requiredJars[@]}"
+do
+    LAUNCHER_CLASSPATH="$LAUNCHER_CLASSPATH:$jar"
+done
+echo "Setting launcher's classpath in heronrc: $LAUNCHER_CLASSPATH"
 
-cp /usr/hdp/current/hadoop-yarn-client/hadoop-yarn-api.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-yarn-client/hadoop-yarn-client.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-yarn-client/hadoop-yarn-common.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/hadoop-auth.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/hadoop-azure.jar $TEMP_CLASSPATH_DIR
-cp /usr/hdp/current/hadoop-client/hadoop-common.jar $TEMP_CLASSPATH_DIR
+cat >> $HERON_RC <<EOL
+heron:submit:* --extra-launch-classpath $LAUNCHER_CLASSPATH 
+EOL
 
-
-cp $HADOOP_CONF_DIR/yarn-site.xml . && jar uf $TEMP_CLASSPATH_DIR/hadoop-yarn-common.jar yarn-site.xml && rm yarn-site.xml
-cp $HADOOP_CONF_DIR/core-site.xml . && jar uf $TEMP_CLASSPATH_DIR/hadoop-common.jar core-site.xml && rm core-site.xml
-chmod +r $TEMP_CLASSPATH_DIR/hadoop-yarn-common.jar $TEMP_CLASSPATH_DIR/hadoop-common.jar
