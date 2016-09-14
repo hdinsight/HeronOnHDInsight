@@ -20,9 +20,9 @@ Heron is a successor of Apache Storm (stream processing), open sourced by Twitte
   4. Select `Nimbus` and `Supervisor` nodes as intallation targets. The script will install Heron client on the `Nimbus` nodes (the head nodes in this case) and install dependencies on the `Supervisor` (worker) nodes.
   5. The script takes the following parameters
     1. Required `ZooKeeper` host name:  `-z <zk_host_name>`, for e.g. `zk0-heron`. Use the value obtained from `Cluster Dashboard` above.
-    1. Optional Heron version string:  `-v <version>`, for e.g. ` 0.14.3.SNAPSHOT`. The default value is `stable`
+    1. Optional Heron version string:  `-v <version>`, for e.g. ` 0.14.4.SNAPSHOT`. The default value is `0.14.3`
     1. Optional flag to overwrite existing installation:  `-f`
-    1. Sample parameter string: `-z zk0-heron -v 0.14.3.SNAPSHOT -f`
+    1. Sample parameter string: `-z zk0-heron -v 0.14.4.SNAPSHOT -f`
 
 ## Submit a topology
 1. Connect (SSH) to one of the nodes where the Heron client is installed, the `head` nodes in this case.
