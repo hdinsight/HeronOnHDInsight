@@ -1,0 +1,18 @@
+FROM ubuntu:14.04
+
+RUN apt-get update && apt-get -y install \
+      curl \
+      git \
+      libssl-dev \
+      libtool \
+      libunwind8 \
+      libunwind-setjmp0-dev \
+      python \
+      software-properties-common \
+      unzip \
+      wget \
+      zip \
+      openjdk-7-jdk
+
+ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
+ENV PEX_ROOT /
