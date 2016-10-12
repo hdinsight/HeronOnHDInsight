@@ -22,7 +22,7 @@ fi
 
 # Parse options to the installer, zookeeper host and heron version to be installed
 ZK_HOSTS="zk0-heron"
-HERON_VERSION="0.14.3"
+HERON_VERSION="0.14.4"
 OVERWRITE=false
 while getopts ":z:v:f" opt; do
   case $opt in
@@ -38,7 +38,7 @@ while getopts ":z:v:f" opt; do
     \?)
       echo " " 1>&2
       echo "Invalid use of the installer" 1>&2 
-      echo "Usage e.g. [-z zk0-heron] [-v 0.14.3.SNAPSHOT] [-f]" 1>&2
+      echo "Usage e.g. [-z zk0-heron] [-v 0.14.4.SNAPSHOT] [-f]" 1>&2
       echo "-z zookeeper host" 1>&2
       echo "-v heron installer version" 1>&2
       echo "-f force overwrite existing installation" 1>&2
