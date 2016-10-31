@@ -72,9 +72,9 @@ fi
 
 
 # Fetch and install heron client and tools
-DOWNLOAD_SOURCE_URL="https://heronhdi.blob.core.windows.net/heron-bin/"
-HERON_CLIENT_INSTALLER="heron-client-install-$HERON_VERSION-ubuntu14.sh"
-HERON_TOOLS_INSTALLER="heron-tools-install-$HERON_VERSION-ubuntu14.sh"
+DOWNLOAD_SOURCE_URL="https://github.com/twitter/heron/releases/download/$HERON_VERSION/"
+HERON_CLIENT_INSTALLER="heron-client-install-$HERON_VERSION-ubuntu.sh"
+HERON_TOOLS_INSTALLER="heron-tools-install-$HERON_VERSION-ubuntu.sh"
 
 echo "Downloading and installing Heron client: $DOWNLOAD_SOURCE_URL/$HERON_CLIENT_INSTALLER"
 download_file $DOWNLOAD_SOURCE_URL/$HERON_CLIENT_INSTALLER /tmp/$HERON_CLIENT_INSTALLER
