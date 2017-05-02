@@ -22,7 +22,7 @@ fi
 
 # Parse options to the installer, zookeeper host and heron version to be installed
 ZK_HOSTS="zk0-heron"
-HERON_VERSION="0.14.5"
+HERON_VERSION="0.14.6"
 OVERWRITE=false
 while getopts ":z:v:f" opt; do
   case $opt in
